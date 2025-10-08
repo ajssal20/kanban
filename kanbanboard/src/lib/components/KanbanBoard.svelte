@@ -34,7 +34,7 @@
 <header class="bg-white shadow p-4 flex justify-between items-center">
   <div>
     <h1 class="text-2xl font-bold">Kanban Board</h1>
-    <p class="text-sm text-gray-500">Land: {userCountry}</p>
+    <p class="text-sm text-pink-500">Land: {userCountry}</p>
   </div>
   <button on:click={() => showDialog = true} class="bg-blue-500 text-white px-4 py-2 rounded">+ Neue Aufgabe</button>
 </header>
