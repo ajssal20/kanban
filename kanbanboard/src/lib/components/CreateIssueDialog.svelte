@@ -1,5 +1,5 @@
 <script>
-  import { issues } from '$lib/stores/issues'; // 👈 bitte auf die exakte Groß-/Kleinschreibung achten!
+  import { issues } from '$lib/stores/issues'; 
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
 

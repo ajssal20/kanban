@@ -1,46 +1,52 @@
 <script>
-  import Issue from './Issue.svelte';
-  import { issues as issuesStore } from '$lib/stores/Issues'; // Store mit anderem Namen importieren
+  import Issue from '$lib/components/Issue.svelte';
+  import { issues as issuesStore } from '$lib/stores/Issues';
 
   export let lane;
-  export let laneIssues = []; // Prop für die Issues dieser Lane
+  export let issues = [];
 
   let dragOver = false;
 
-  function handleDragOver(e){ 
-    e.preventDefault(); 
-    dragOver = true; 
+  function handleDragOver(event) {
+    event.preventDefault();
+    dragOver = true;
   }
 
-  function handleDragLeave(){ 
-    dragOver = false; 
-  }
-
-  function handleDrop(e){
-    e.preventDefault();
+  function handleDragLeave() {
     dragOver = false;
-    const id = e.dataTransfer.getData('text/plain');
-    if (id) issuesStore.moveIssue(id, lane.id); // Store benutzen
   }
 
-  $: totalPoints = laneIssues.reduce((sum, i) => sum + i.storyPoints, 0);
+  function handleDrop(event) {
+    event.preventDefault();
+    dragOver = false;
+    const issueId = event.dataTransfer.getData('text/plain');
+    if (issueId) {
+      issuesStore.moveIssue(issueId, lane.id);
+    }
+  }
+
+  $: totalPoints = issues.reduce((sum, issue) => sum + issue.storyPoints, 0);
 </script>
 
-<div 
-  on:dragover={handleDragOver} 
-  on:dragleave={handleDragLeave} 
+<div
+  class="flex flex-col h-full min-h-[500px] rounded-2xl p-3 transition-all duration-300 backdrop-blur-sm"
+  class:ring-4={dragOver}
+  class:ring-offset-2={dragOver}
+  on:dragover={handleDragOver}
+  on:dragleave={handleDragLeave}
   on:drop={handleDrop}
-  class="flex flex-col p-2 border rounded min-h-[200px]"
+  style="background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.5));"
 >
-  <div class="flex justify-between items-center p-2 bg-gray-100 rounded">
-    <h2>{lane.title}</h2>
-    <span>{totalPoints} SP</span>
+  <div class="flex justify-between items-center mb-4 p-4 rounded-xl border-2 {lane.border} bg-gradient-to-r from-pink-100 to-green-100 shadow-sm">
+    <h2 class="text-lg font-semibold text-gray-800 tracking-wide">{lane.title}</h2>
+    <span class="bg-white px-2 py-1 rounded-full text-sm font-medium text-gray-700 shadow">
+      {totalPoints} SP
+    </span>
   </div>
 
-  <div class="flex-1 mt-2 space-y-2">
-    {#each laneIssues as issue (issue.id)}
+  <div class="flex-1 space-y-3 p-2 min-h-[200px] transition-all duration-300">
+    {#each issues as issue (issue.id)}
       <Issue {issue} />
     {/each}
   </div>
 </div>
-
