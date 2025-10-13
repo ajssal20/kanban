@@ -1,12 +1,12 @@
 <script>
-	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+  import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
 
-	let { children } = $props();
+  onMount(() => {
+    if (browser && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+    }
+  });
 </script>
 
-<svelte:head>
-	<link rel="icon" href={favicon} />
-</svelte:head>
-
-{@render children?.()}
+<slot />

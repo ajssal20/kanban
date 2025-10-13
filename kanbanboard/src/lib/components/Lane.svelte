@@ -1,8 +1,8 @@
 <script>
   import Issue from '$lib/components/Issue.svelte';
-  import { issues as issuesStore } from '$lib/stores/Issues';
+  import { issues as issuesStore } from '$lib/stores/issues';
 
-  export let lane;
+  export let lane;         // { id, title }
   export let issues = [];
 
   let dragOver = false;
@@ -11,42 +11,36 @@
     event.preventDefault();
     dragOver = true;
   }
-
   function handleDragLeave() {
     dragOver = false;
   }
-
   function handleDrop(event) {
     event.preventDefault();
     dragOver = false;
     const issueId = event.dataTransfer.getData('text/plain');
-    if (issueId) {
-      issuesStore.moveIssue(issueId, lane.id);
-    }
+    if (issueId) issuesStore.moveIssue(issueId, lane.id);
   }
 
-  $: totalPoints = issues.reduce((sum, issue) => sum + issue.storyPoints, 0);
+  $: totalPoints = issues.reduce((sum, it) => sum + (Number(it.storyPoints) || 0), 0);
 </script>
 
-<div
-  class="flex flex-col h-full min-h-[500px] rounded-2xl p-3 transition-all duration-300 backdrop-blur-sm"
+<section
+  class="flex flex-col h-full min-h-[460px] rounded-2xl p-3 transition-all border bg-white/60 backdrop-blur-sm"
   class:ring-4={dragOver}
   class:ring-offset-2={dragOver}
   on:dragover={handleDragOver}
   on:dragleave={handleDragLeave}
   on:drop={handleDrop}
-  style="background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.5));"
+  aria-label={`Lane ${lane.title}`}
 >
-  <div class="flex justify-between items-center mb-4 p-4 rounded-xl border-2 {lane.border} bg-gradient-to-r from-pink-100 to-green-100 shadow-sm">
-    <h2 class="text-lg font-semibold text-gray-800 tracking-wide">{lane.title}</h2>
-    <span class="bg-white px-2 py-1 rounded-full text-sm font-medium text-gray-700 shadow">
-      {totalPoints} SP
-    </span>
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-base font-semibold tracking-wide">{lane.title}</h2>
+    <span class="text-xs px-2 py-1 rounded-full bg-gray-100">Summe: {totalPoints} SP</span>
   </div>
 
-  <div class="flex-1 space-y-3 p-2 min-h-[200px] transition-all duration-300">
+  <div class="flex-1 space-y-3">
     {#each issues as issue (issue.id)}
       <Issue {issue} />
     {/each}
   </div>
-</div>
+</section>

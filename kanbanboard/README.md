@@ -1,38 +1,25 @@
-# sv
+# Kanban (SvelteKit)
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Elegantes, installierbares Kanban-Board mit 4 Lanes (Do, Doing, Done, Archiv).  
+Features:
+- Issues anlegen via **HTML `<dialog>`**
+- Drag & Drop (ohne Lib)
+- **LocalStorage**-Persistenz
+- **date-fns** für Datumsanzeige (de)
+- **Overdue**-Warnung
+- **Story Points**-Summen pro Lane
+- **Notification**, wenn ein Item auf *Done* gezogen wird
+- **ICS-Export** je Item
+- **Web Share API** je Item
+- **CSV-Export** aller Items
+- **Geo-IP**: Land im Header
+- **PWA** (Service Worker, Manifest)
 
-## Creating a project
+## Setup
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```bash
+pnpm i
+# tailwind optional; Styles hier sind neutral (ohne Tailwind). Wenn du Tailwind willst:
+# pnpm i -D tailwindcss postcss autoprefixer
+# npx tailwindcss init -p
+pnpm dev
