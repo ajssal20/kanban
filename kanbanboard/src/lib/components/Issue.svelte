@@ -40,68 +40,34 @@ END:VCALENDAR`;
   }
 </script>
 
-<div class="issue-card" draggable="true" on:dragstart={handleDragStart}>
-  <h3>🌸 {issue.title}</h3>
-  <p>{issue.description}</p>
-  <p class="due">📅 Fällig: {format(new Date(issue.dueDate), 'PPP', { locale: de })}</p>
+<div
+  class="bg-white border border-pink-200 rounded-2xl p-4 shadow hover:shadow-lg hover:border-pink-400 transition relative cursor-grab active:cursor-grabbing"
+  draggable="true"
+  role="listitem"
+  on:dragstart={handleDragStart}
+>
+  <h3 class="text-pink-700 font-bold text-lg flex items-center gap-1 mb-1">
+    🌸 {issue.title}
+  </h3>
+  <p class="text-gray-700 text-sm mb-2 leading-snug">{issue.description}</p>
+  <p class="text-gray-500 text-xs">📅 Fällig: {format(new Date(issue.dueDate), 'PPP', { locale: de })}</p>
+
   {#if isOverdue}
-    <span class="overdue">Überfällig!</span>
+    <span class="absolute top-2 right-2 bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-md font-semibold">Überfällig!</span>
   {/if}
-  <div class="btns">
-    <button on:click={exportICS}>ICS</button>
-    <button on:click={shareIssue}>Teilen</button>
+
+  <div class="flex justify-end gap-2 mt-3">
+    <button
+      on:click={exportICS}
+      class="bg-pink-100 hover:bg-pink-200 text-pink-800 text-xs font-semibold px-3 py-1 rounded-lg transition"
+    >
+      ICS
+    </button>
+    <button
+      on:click={shareIssue}
+      class="bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold px-3 py-1 rounded-lg transition"
+    >
+      Teilen
+    </button>
   </div>
 </div>
-
-<style>
-  .issue-card {
-    background: linear-gradient(135deg, #fff, #ffe4f2);
-    border: 1px solid #f9a8d4;
-    border-radius: 16px;
-    padding: 1rem;
-    position: relative;
-    box-shadow: 0 3px 6px rgba(236, 72, 153, 0.3);
-  }
-  h3 {
-    color: #be185d;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-  }
-  p {
-    font-size: 0.9rem;
-    color: #4b5563;
-  }
-  .due {
-    font-size: 0.8rem;
-    margin-top: 0.3rem;
-    color: #6b7280;
-  }
-  .overdue {
-    position: absolute;
-    top: 6px;
-    right: 10px;
-    background: #fecaca;
-    color: #991b1b;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 6px;
-  }
-  .btns {
-    margin-top: 0.5rem;
-    display: flex;
-    justify-content: end;
-    gap: 0.6rem;
-  }
-  button {
-    background: #f9a8d4;
-    border: none;
-    padding: 0.3rem 0.7rem;
-    border-radius: 8px;
-    color: #6b021f;
-    font-size: 0.8rem;
-  }
-  button:hover {
-    background: #ec4899;
-    color: white;
-  }
-</style>

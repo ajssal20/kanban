@@ -46,8 +46,7 @@ function createIssuesStore() {
         }
         return updated;
       }),
-    deleteIssue: (id) =>
-      update((issues) => issues.filter((i) => i.id !== id)),
+    deleteIssue: (id) => update((issues) => issues.filter((i) => i.id !== id)),
     clearAll: () => set([])
   };
 }
