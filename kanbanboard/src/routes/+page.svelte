@@ -1,86 +1,100 @@
 <script>
   import { issues } from '$lib/stores/issues';
-  import { browser } from '$app/environment';
-  import { get } from 'svelte/store';
-
   import Lane from '$lib/components/Lane.svelte';
   import CreateIssueDialog from '$lib/components/CreateIssueDialog.svelte';
+  import { get } from 'svelte/store';
 
   let showDialog = false;
-  let userCountry = 'Unbekannt';
+  let country = 'Unbekannt';
 
   const lanes = [
-    { id: 'do',    title: 'To Do' },
+    { id: 'do', title: 'To Do' },
     { id: 'doing', title: 'Doing' },
-    { id: 'done',  title: 'Done' },
+    { id: 'done', title: 'Done' },
     { id: 'archive', title: 'Archiv' }
   ];
 
-  $: currentIssues = browser && Array.isArray($issues) ? $issues : [];
+  $: current = $issues || [];
 
-  async function getCountry() {
-    if (!browser) return;
-    try {
-      const res = await fetch('https://ipapi.co/json/');
-      const data = await res.json();
-      userCountry = data?.country_name || 'Unbekannt';
-    } catch {
-      userCountry = 'Unbekannt';
-    }
+  async function fetchCountry() {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    country = data.country_name || 'Unbekannt';
   }
-  if (browser) getCountry();
-
-  function csvEscape(value = '') {
-    const s = String(value ?? '');
-    const needsQuote = /[",\n]/.test(s);
-    const q = s.replace(/"/g, '""');
-    return needsQuote ? `"${q}"` : q;
-  }
+  fetchCountry();
 
   function exportCSV() {
     const all = get(issues);
     const rows = [
       ['Title','Description','Creation Date','Due Date','Story Points','Priority','Lane'],
-      ...all.map(i => [
-        i.title, i.description, i.creationDate, i.dueDate, i.storyPoints, i.priority, i.lane
-      ])
-    ];
-    const csv = rows.map(r => r.map(csvEscape).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
+      ...all.map(i => [i.title, i.description, i.creationDate, i.dueDate, i.storyPoints, i.priority, i.lane])
+    ].map(r => r.join(',')).join('\n');
+    const blob = new Blob([rows], { type: 'text/csv' });
     const a = document.createElement('a');
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = 'issues.csv';
     a.click();
-    URL.revokeObjectURL(url);
   }
 </script>
 
-<div class="min-h-screen bg-gradient-to-b from-neutral-50 to-neutral-100">
-  <header class="border-b bg-white/70 backdrop-blur">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div>
-        <h1 class="text-lg sm:text-xl font-semibold">Kanban</h1>
-        <p class="text-xs text-gray-500">Land: {userCountry}</p>
-      </div>
-      <div class="flex gap-2">
-        <button class="px-3 py-2 rounded-md bg-black text-white" on:click={() => showDialog = true}>+ Neue Aufgabe</button>
-        <button class="px-3 py-2 rounded-md border" on:click={exportCSV}>CSV Export</button>
-      </div>
+<div class="app">
+  <header>
+    <div>
+      <h1>💖 Pink Kanban Board</h1>
+      <p>Land: {country}</p>
+    </div>
+    <div class="actions">
+      <button on:click={() => showDialog = true}>+ Neue Aufgabe</button>
+      <button on:click={exportCSV}>📤 CSV Export</button>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {#each lanes as lane}
-        <Lane {lane} issues={currentIssues.filter(i => i.lane === lane.id)} />
-      {/each}
-    </div>
+  <main>
+    {#each lanes as lane}
+      <Lane {lane} issues={current.filter(i => i.lane === lane.id)} />
+    {/each}
   </main>
 
-  <footer class="py-6 text-center text-xs text-gray-500">
-    Installierbar als PWA • Offlinefähig
-  </footer>
-
-  <CreateIssueDialog bind:open={showDialog} on:close={() => (showDialog = false)} />
+  {#if showDialog}
+    <CreateIssueDialog on:close={() => showDialog = false} />
+  {/if}
 </div>
+
+<style>
+  .app {
+    background: linear-gradient(180deg, #fdf2f8 0%, #fff 100%);
+    min-height: 100vh;
+    padding: 1rem;
+    font-family: 'Poppins', sans-serif;
+  }
+  header {
+    background: linear-gradient(to right, #fbcfe8, #f9a8d4, #fce7f3);
+    border-radius: 20px;
+    padding: 1rem 2rem;
+    box-shadow: 0 3px 8px rgba(236, 72, 153, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    color: #9d174d;
+    margin: 0;
+  }
+  .actions button {
+    margin-left: 0.5rem;
+    background: #ec4899;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.6rem 1.2rem;
+  }
+  .actions button:hover {
+    background: #db2777;
+  }
+  main {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+</style>

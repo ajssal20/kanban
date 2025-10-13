@@ -2,45 +2,54 @@
   import Issue from '$lib/components/Issue.svelte';
   import { issues as issuesStore } from '$lib/stores/issues';
 
-  export let lane;         // { id, title }
+  export let lane;
   export let issues = [];
 
-  let dragOver = false;
-
-  function handleDragOver(event) {
-    event.preventDefault();
-    dragOver = true;
-  }
-  function handleDragLeave() {
-    dragOver = false;
-  }
-  function handleDrop(event) {
-    event.preventDefault();
-    dragOver = false;
-    const issueId = event.dataTransfer.getData('text/plain');
-    if (issueId) issuesStore.moveIssue(issueId, lane.id);
+  function handleDrop(e) {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    issuesStore.moveIssue(id, lane.id);
   }
 
-  $: totalPoints = issues.reduce((sum, it) => sum + (Number(it.storyPoints) || 0), 0);
+  function allowDrop(e) {
+    e.preventDefault();
+  }
+
+  $: total = issues.reduce((s, i) => s + i.storyPoints, 0);
 </script>
 
-<section
-  class="flex flex-col h-full min-h-[460px] rounded-2xl p-3 transition-all border bg-white/60 backdrop-blur-sm"
-  class:ring-4={dragOver}
-  class:ring-offset-2={dragOver}
-  on:dragover={handleDragOver}
-  on:dragleave={handleDragLeave}
-  on:drop={handleDrop}
-  aria-label={`Lane ${lane.title}`}
->
-  <div class="flex items-center justify-between mb-3">
-    <h2 class="text-base font-semibold tracking-wide">{lane.title}</h2>
-    <span class="text-xs px-2 py-1 rounded-full bg-gray-100">Summe: {totalPoints} SP</span>
+<div class="lane" on:drop={handleDrop} on:dragover={allowDrop}>
+  <div class="lane-header">
+    <h2>{lane.title}</h2>
+    <span>{total} SP</span>
   </div>
-
-  <div class="flex-1 space-y-3">
+  <div class="lane-content">
     {#each issues as issue (issue.id)}
       <Issue {issue} />
     {/each}
   </div>
-</section>
+</div>
+
+<style>
+  .lane {
+    background: linear-gradient(180deg, #fff0f6, #fff);
+    border: 2px solid #f9a8d4;
+    border-radius: 20px;
+    padding: 1rem;
+  }
+  .lane-header {
+    display: flex;
+    justify-content: space-between;
+    background: #fbcfe8;
+    padding: 0.5rem 0.8rem;
+    border-radius: 12px;
+    color: #9d174d;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  .lane-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+</style>
