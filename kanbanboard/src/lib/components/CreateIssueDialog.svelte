@@ -10,6 +10,20 @@
   let storyPoints = 1;
   let priority = 'medium';
   let lane = 'do';
+  let showFlowers = false;
+
+  const borderFlowers = [
+    'top:-10px; left:10%;',
+    'top:-10px; left:45%;',
+    'top:-10px; right:10%;',
+    'right:-10px; top:25%;',
+    'right:-10px; top:65%;',
+    'bottom:-10px; right:10%;',
+    'bottom:-10px; left:45%;',
+    'bottom:-10px; left:10%;',
+    'left:-10px; top:25%;',
+    'left:-10px; top:65%;'
+  ];
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -24,8 +38,9 @@
       lane
     });
 
+    triggerFlowerAnimation();
     reset();
-    dispatch('close');
+    setTimeout(() => dispatch('close'), 2600);
   }
 
   function reset() {
@@ -37,113 +52,198 @@
     lane = 'do';
   }
 
+  function triggerFlowerAnimation() {
+    showFlowers = true;
+    setTimeout(() => (showFlowers = false), 2000);
+  }
+
   onMount(() => {
     if (Notification.permission === 'default') Notification.requestPermission();
   });
 </script>
 
-<div class="dialog-backdrop">
-  <div class="dialog-card">
-    <h2>🌸 Neue Aufgabe</h2>
-    <form on:submit={handleSubmit}>
-      <label>Titel *</label>
-      <input bind:value={title} required />
-
-      <label>Beschreibung</label>
-      <textarea bind:value={description}></textarea>
-
-      <label>Fällig am</label>
-      <input type="date" bind:value={dueDate} />
-
-      <label>Story Points</label>
-      <select bind:value={storyPoints}>
-        {#each [1,2,3,5,8,13] as p}
-          <option value={p}>{p}</option>
+<!-- 🌸 MODAL -->
+<div
+  class="fixed inset-0 z-[9999] flex items-center justify-center bg-pink-200/50 backdrop-blur-sm"
+>
+  <div
+    class="relative bg-gradient-to-b from-pink-50 to-white border-2 border-pink-300 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] p-8 w-[90%] max-w-md overflow-hidden animate-popup"
+  >
+    {#if showFlowers}
+      <!-- Randblumen -->
+      <div class="absolute inset-0 pointer-events-none">
+        {#each borderFlowers as pos, i}
+          <div class="absolute flower" style={`animation-delay:${i * 0.1}s; ${pos}`}></div>
         {/each}
-      </select>
+      </div>
 
-      <label>Priorität</label>
-      <select bind:value={priority}>
-        <option value="low">Niedrig</option>
-        <option value="medium">Mittel</option>
-        <option value="high">Hoch</option>
-      </select>
+      <!-- Schwebende Blüten -->
+      <div class="absolute inset-0 pointer-events-none">
+        {#each Array(10) as _, i}
+          <div
+            class="absolute petal"
+            style={`top:${Math.random() * 100}%; left:${Math.random() * 100}%; animation-delay:${Math.random()}s;`}
+          ></div>
+        {/each}
+      </div>
+    {/if}
 
-      <label>Spalte</label>
-      <select bind:value={lane}>
-        <option value="do">To Do</option>
-        <option value="doing">Doing</option>
-        <option value="done">Done</option>
-        <option value="archive">Archiv</option>
-      </select>
+    <h2 class="text-center text-pink-700 font-extrabold text-3xl mb-6 flex justify-center items-center gap-2">
+      🌸 Neue Aufgabe
+    </h2>
 
-      <div class="btns">
-        <button type="button" on:click={() => dispatch('close')} class="cancel">Abbrechen</button>
-        <button type="submit" class="create">Erstellen</button>
+    <form on:submit={handleSubmit} class="space-y-5">
+      <div>
+        <label class="block text-pink-800 font-semibold mb-1">Titel *</label>
+        <input
+          bind:value={title}
+          required
+          class="w-full border border-pink-300 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-pink-400 outline-none shadow-inner"
+        />
+      </div>
+
+      <div>
+        <label class="block text-pink-800 font-semibold mb-1">Beschreibung</label>
+        <textarea
+          bind:value={description}
+          class="w-full border border-pink-300 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-pink-400 outline-none shadow-inner"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div>
+        <label class="block text-pink-800 font-semibold mb-1">Fällig am</label>
+        <input
+          type="date"
+          bind:value={dueDate}
+          class="w-full border border-pink-300 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-pink-400 outline-none shadow-inner"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-pink-800 font-semibold mb-1">Story Points</label>
+          <select
+            bind:value={storyPoints}
+            class="w-full border border-pink-300 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-pink-400 outline-none shadow-inner"
+          >
+            {#each [1, 2, 3, 5, 8, 13] as p}
+              <option value={p}>{p}</option>
+            {/each}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-pink-800 font-semibold mb-1">Priorität</label>
+          <select
+            bind:value={priority}
+            class="w-full border border-pink-300 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-pink-400 outline-none shadow-inner"
+          >
+            <option value="low">Niedrig</option>
+            <option value="medium">Mittel</option>
+            <option value="high">Hoch</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-pink-800 font-semibold mb-1">Spalte</label>
+        <select
+          bind:value={lane}
+          class="w-full border border-pink-300 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-pink-400 outline-none shadow-inner"
+        >
+          <option value="do">To Do</option>
+          <option value="doing">Doing</option>
+          <option value="done">Done</option>
+          <option value="archive">Archiv</option>
+        </select>
+      </div>
+
+      <div class="flex justify-between mt-8">
+        <button
+          type="button"
+          on:click={() => dispatch('close')}
+          class="bg-pink-100 text-pink-800 px-5 py-2 rounded-xl font-semibold hover:bg-pink-200 transition"
+        >
+          Abbrechen
+        </button>
+        <button
+          type="submit"
+          class="bg-pink-500 text-white px-5 py-2 rounded-xl font-semibold hover:bg-pink-600 transition transform hover:scale-105"
+        >
+          Erstellen
+        </button>
       </div>
     </form>
   </div>
 </div>
 
 <style>
-  .dialog-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(255, 192, 203, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 50;
+  /* 🌸 Animationen & Blumen */
+  .flower {
+    width: 26px;
+    height: 26px;
+    background-image: radial-gradient(circle at 6px 6px, pink 40%, transparent 40%),
+                      radial-gradient(circle at 20px 6px, pink 40%, transparent 40%),
+                      radial-gradient(circle at 6px 20px, pink 40%, transparent 40%),
+                      radial-gradient(circle at 20px 20px, pink 40%, transparent 40%),
+                      radial-gradient(circle at 13px 13px, yellow 35%, transparent 35%);
+    background-size: 26px 26px;
+    animation: bloom 2s ease-in-out forwards;
+    opacity: 0.8;
   }
-  .dialog-card {
-    background: linear-gradient(180deg, #fff0f6, #fff);
-    border: 2px solid #f9a8d4;
-    border-radius: 20px;
-    padding: 2rem;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3);
+
+  .petal {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at center, #fbcfe8 0%, #f472b6 70%);
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatPetal 3s ease-in-out forwards;
   }
-  h2 {
-    text-align: center;
-    color: #be185d;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
+
+  @keyframes bloom {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
   }
-  label {
-    display: block;
-    font-size: 0.9rem;
-    margin-top: 0.6rem;
-    color: #a21caf;
+
+  @keyframes floatPetal {
+    0% {
+      transform: translateY(0) scale(0.5);
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-50px) scale(1.2) rotate(360deg);
+      opacity: 0;
+    }
   }
-  input, textarea, select {
-    width: 100%;
-    border: 1px solid #f9a8d4;
-    border-radius: 10px;
-    padding: 0.5rem;
-    background-color: #fff;
+
+  @keyframes popup {
+    0% {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
-  textarea { resize: none; }
-  .btns {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-  }
-  .cancel {
-    background: #fde2e9;
-    border: none;
-    border-radius: 10px;
-    padding: 0.6rem 1.2rem;
-    color: #881337;
-  }
-  .create {
-    background: #ec4899;
-    border: none;
-    color: white;
-    border-radius: 10px;
-    padding: 0.6rem 1.2rem;
-  }
-  .create:hover {
-    background: #db2777;
+
+  .animate-popup {
+    animation: popup 0.3s ease-out;
   }
 </style>
