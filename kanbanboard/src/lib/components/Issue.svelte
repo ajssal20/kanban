@@ -3,14 +3,20 @@
   import { de } from 'date-fns/locale';
   export let issue;
 
+  // Warum: Softer Hinweis bei Überfälligkeit (nicht schrill).
   const isOverdue = new Date(issue.dueDate) < new Date();
 
   function handleDragStart(e) {
+    //  Drag-&-Drop ID weitergeben – Funktion unverändert.
     e.dataTransfer.setData('text/plain', issue.id);
   }
 
   function exportICS() {
-    const start = new Date(issue.dueDate).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    // ICS Export – Nutzen: Termin in Kalender ziehen; belassen.
+    const start = new Date(issue.dueDate)
+      .toISOString()
+      .replace(/[-:]/g, '')
+      .split('.')[0] + 'Z';
     const ics = `BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
@@ -29,6 +35,7 @@ END:VCALENDAR`;
   }
 
   async function shareIssue() {
+    // ✅Web Share – reduziert Reibung beim Teilen; belassen.
     if (navigator.share) {
       await navigator.share({
         title: issue.title,
@@ -40,32 +47,44 @@ END:VCALENDAR`;
   }
 </script>
 
+<!--  Visueller Stil:
+     - klassische Karte mit klarem Rand
+     - wenig Sättigung, Fokus auf Inhalt
+     - weiches Hover für „lebendig aber ruhig“ -->
 <div
-  class="bg-white border border-pink-200 rounded-2xl p-4 shadow hover:shadow-lg hover:border-pink-400 transition relative cursor-grab active:cursor-grabbing"
+  class="bg-white border border-rose-100 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-rose-200 transition relative cursor-grab active:cursor-grabbing"
   draggable="true"
   role="listitem"
   on:dragstart={handleDragStart}
 >
-  <h3 class="text-pink-700 font-bold text-lg flex items-center gap-1 mb-1">
-    🌸 {issue.title}
+  <h3 class="text-rose-700 font-semibold text-[1.05rem] mb-1 leading-tight">
+    {issue.title}
   </h3>
-  <p class="text-gray-700 text-sm mb-2 leading-snug">{issue.description}</p>
-  <p class="text-gray-500 text-xs">📅 Fällig: {format(new Date(issue.dueDate), 'PPP', { locale: de })}</p>
+
+  <p class="text-[#5e5560] text-[0.92rem] mb-2 leading-snug">{issue.description}</p>
+
+  <p class="text-[#8a8190] text-xs">
+    📅 Fällig: {format(new Date(issue.dueDate), 'PPP', { locale: de })}
+  </p>
 
   {#if isOverdue}
-    <span class="absolute top-2 right-2 bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-md font-semibold">Überfällig!</span>
+    <!--  dezenter Warnchip statt heftiger rote Box -->
+    <span class="absolute top-2 right-2 bg-rose-50 text-rose-700 text-[0.7rem] px-2 py-0.5 rounded-md border border-rose-200 font-medium">
+      Überfällig
+    </span>
   {/if}
 
+  <!--  Buttons: Primär (rosa), Sekundär (outline) – klare Hierarchie -->
   <div class="flex justify-end gap-2 mt-3">
     <button
       on:click={exportICS}
-      class="bg-pink-100 hover:bg-pink-200 text-pink-800 text-xs font-semibold px-3 py-1 rounded-lg transition"
+      class="bg-white text-rose-700 border border-rose-300 hover:bg-rose-50 text-xs font-semibold px-3 py-1 rounded-md transition"
     >
       ICS
     </button>
     <button
       on:click={shareIssue}
-      class="bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold px-3 py-1 rounded-lg transition"
+      class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold px-3 py-1 rounded-md transition shadow-sm"
     >
       Teilen
     </button>

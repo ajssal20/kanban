@@ -8,18 +8,18 @@
   let showDialog = false;
   let country = 'Unbekannt';
 
-  // ✅ Ich definiere je Lane eine dezente Panel-Farbe.
+  //  Ich definiere je Lane eine dezente Panel-Farbe.
   //    Grund: „Rahmen um die Lane“ ohne zu schreien – besser lesbar & optisch gruppiert.
   const lanes = [
-    { id: 'do',     title: '📋 To Do',  panel: 'bg-[#fef5f6]' }, // zartes Rosé
-    { id: 'doing',  title: '⚙️ Doing', panel: 'bg-[#fff8f0]' }, // zartes Apricot
-    { id: 'done',   title: '✅ Done',  panel: 'bg-[#f3fbf4]' }, // zartes Mint (Erfolg)
-    { id: 'archive',title: '🗂️ Archiv', panel: 'bg-[#f6f4fb]' } // zartes Flieder
+    { id: 'do',     title: 'To Do',  panel: 'bg-[#fef5f6]' }, // zartes Rosé
+    { id: 'doing',  title: 'Doing', panel: 'bg-[#fff8f0]' }, // zartes Apricot
+    { id: 'done',   title: 'Done',  panel: 'bg-[#f3fbf4]' }, // zartes Mint (Erfolg)
+    { id: 'archive',title: 'Archiv', panel: 'bg-[#f6f4fb]' } // zartes Flieder
   ];
 
   $: current = $issues || [];
 
-  // ✅ Land laden – wird im Header angezeigt (Kontext/Vertrauen).
+  //  Land laden – wird im Header angezeigt (Kontext/Vertrauen).
   async function fetchCountry() {
     try {
       const res = await fetch('https://ipapi.co/json/');
@@ -31,7 +31,7 @@
   }
   fetchCountry();
 
-  // ✅ Export bleibt – hier keine Styleänderung notwendig.
+  // Export
   function exportCSV() {
     const all = get(issues);
     const rows = [
@@ -46,19 +46,19 @@
   }
 </script>
 
-<!-- ✅ Ruhiger, klassischer Hintergrund:
+<!--  Ruhiger, klassischer Hintergrund:
      - viel Weiß/Creme mit leichtem Rosa-Verlauf
      - Ziel: „calm“ und nicht kitschig -->
 <div class="min-h-screen bg-gradient-to-br from-[#faf5f7] via-[#fffafc] to-[#fefaf8] text-[#4a3f4b] font-[Poppins]">
 
-  <!-- ✅ Zurückhaltender Header:
+  <!--  Zurückhaltender Header:
        - halbtransparenter weißer Balken mit Blur für moderne Ruhe
        - sehr dezente Linie + kleiner Schatten -->
   <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-rose-100 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row gap-2 sm:gap-6 items-center justify-between">
       <div>
         <!-- Titel: kräftiger, aber nicht grell -->
-        <h1 class="text-3xl font-extrabold text-rose-600 tracking-tight">🌸 Klassik-Kanban</h1>
+        <h1 class="text-3xl font-extrabold text-rose-600 tracking-tight">Kanban-Board</h1>
         <p class="text-sm text-rose-400">🌍 Land: {country}</p>
       </div>
 
